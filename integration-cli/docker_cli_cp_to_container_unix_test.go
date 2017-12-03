@@ -14,6 +14,29 @@ import (
 	"github.com/go-check/check"
 )
 
+func (s *DockerSuite) TestCpToContainerWithoutPermissions(c *check.C) {
+	testRequires(c, SameHostDaemon, DaemonIsLinux)
+
+	tmpDir := getTestDir(c, "test-cp-to-host-with-permissions")
+	defer os.RemoveAll(tmpDir)
+
+	makeTestContentInDir(c, tmpDir)
+
+	containerName := "permtest"
+
+	_, exc := dockerCmd(c, "create", "--name", containerName, "debian:jessie", "/bin/bash", "-c", "stat -c '%u %g %a' /permdirtest /permdirtest/permtest")
+	c.Assert(exc, checker.Equals, 0)
+	defer dockerCmd(c, "rm", "-f", containerName)
+
+	srcPath := cpPath(tmpDir, "permdirtest")
+	dstPath := containerCpPath(containerName, "/")
+	c.Assert(runDockerCp(c, srcPath, dstPath), checker.IsNil)
+
+	out, err := startContainerGetOutput(c, containerName)
+	c.Assert(err, checker.IsNil, check.Commentf("output: %v", out))
+	c.Assert(strings.TrimSpace(out), checker.Equals, "0 0 755\n0 0 644", check.Commentf("output: %v", out))
+}
+
 // Check ownership is root, both in non-userns and userns enabled modes
 func (s *DockerSuite) TestCpCheckDestOwnership(c *check.C) {
 	testRequires(c, DaemonIsLinux, SameHostDaemon)

@@ -80,6 +80,8 @@ var defaultFileData = []fileData{
 	{ftSymlink, "brokenSymlinkToFileX", "fileX"},
 	{ftSymlink, "brokenSymlinkToDirX", "dirX"},
 	{ftSymlink, "symlinkToAbsDir", "/root"},
+	{ftDir, "permdirtest", ""},
+	{ftRegular, "permdirtest/permtest", "perm_test"},
 }
 
 func defaultMkContentCommand() string {
