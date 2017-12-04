@@ -11,5 +11,6 @@ func (daemon *Daemon) defaultTarCopyOptions(noOverwriteDirNonDir bool) *archive.
 		NoOverwriteDirNonDir: noOverwriteDirNonDir,
 		UIDMaps:              daemon.idMappings.UIDs(),
 		GIDMaps:              daemon.idMappings.GIDs(),
+		NoLchown:             true,
 	}
 }
