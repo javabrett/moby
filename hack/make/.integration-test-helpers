@@ -20,7 +20,13 @@ integration_api_dirs=${TEST_INTEGRATION_DIR:-"$(
 	grep -vE '(^./integration($|/util)|/testdata)')"}
 
 run_test_integration() {
-	[[ "$TESTFLAGS" != *-check.f* ]] && run_test_integration_suites
+	if [[ "$TESTFLAGS" == *-check.f* ]]; then
+		if [[ "$DEST" == "bundles/test-integration" ]]; then
+			echo "WARNING: TESTFLAGS='-check.f ...' skips all tests except deprecated test-integration-cli tests. Use -test.run to filter integration tests."
+		fi
+	else
+		run_test_integration_suites
+	fi
 	run_test_integration_legacy_suites
 }
 
